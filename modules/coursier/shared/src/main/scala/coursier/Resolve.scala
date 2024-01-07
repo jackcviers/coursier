@@ -74,15 +74,8 @@ import scala.language.higherKinds
 
   def finalRepositories: F[Seq[Repository]] = {
     val repositories0 =
-      if (preferConfFileDefaultRepositories) {
-        val defaultFromConfOpt = confFiles
-          .iterator
-          .flatMap(Resolve.confFileRepositories(_).iterator)
-          .take(1)
-          .toList
-          .headOption
-        defaultFromConfOpt.getOrElse(repositories)
-      }
+      if (preferConfFileDefaultRepositories)
+        confFiles.flatMap(Resolve.confFileRepositories(_).getOrElse(repositories)).toList
       else
         repositories
     allMirrors.map(Mirror.replace(repositories0, _))
